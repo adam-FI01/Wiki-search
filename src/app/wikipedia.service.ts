@@ -3,7 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs';
 
-interface car {
+
+interface WikipediaResponse {
+  query: {
+    search: {
+      title: string;
+      snippet: string;
+      pageid: number;
+    }[];
+  };
+}
+/* interface car {
   year: number;
   color: string;
   running: boolean;
@@ -29,7 +39,7 @@ const observable = new Observable<car>((observer) => {
 
 observable.subscribe(value => {
   console.log(value)
-})
+}) */
 
 
 
@@ -41,7 +51,7 @@ export class WikipediaService {
   constructor(private http: HttpClient) { }
 
   search(term: string) {
-    return this.http.get('https://en.wikipedia.org/w/api.php', {
+    return this.http.get<WikipediaResponse>('https://en.wikipedia.org/w/api.php', {
       params: {
         action: 'query',
         format: 'json',
@@ -50,7 +60,9 @@ export class WikipediaService {
         srsearch: term,
         origin: '*'
       }
-    })
+    }).pipe(
+      map(x => x?.query?.search)
+    )
   }
 }
 
